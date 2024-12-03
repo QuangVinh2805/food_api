@@ -1,10 +1,11 @@
 package org.example.food_api.services;
 
-import org.example.food_api.models.*;
+import org.example.food_api.models.Category;
 import org.example.food_api.models.Product;
+import org.example.food_api.models.ProductDetail;
+import org.example.food_api.repository.CategoryRepository;
 import org.example.food_api.repository.ProductDetailRepository;
 import org.example.food_api.repository.ProductRepository;
-import org.example.food_api.repository.UserRepository;
 import org.example.food_api.request.ProductRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -20,11 +22,13 @@ public class ProductService {
     @Autowired
     ProductRepository productRepository;
     @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
     ProductDetailRepository productDetailRepository;
 
-    public ResponseEntity<List<Product>> listAllProduct(){
-        List<Product> listProduct= productRepository.findAll();
-        if(listProduct.isEmpty()) {
+    public ResponseEntity<List<Product>> listAllProduct() {
+        List<Product> listProduct = productRepository.findAll();
+        if (listProduct.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<List<Product>>(listProduct, HttpStatus.OK);
@@ -39,24 +43,15 @@ public class ProductService {
         }
         return new ResponseEntity<>(pagedResult.getContent(), HttpStatus.OK);
     }
-    public ResponseEntity<Product> createProduct(ProductRequest productRequest) {
-        // Kiểm tra null và tính hợp lệ của các trường trong ProductRequest
-        if (productRequest.getProductName() == null || productRequest.getProductName().isEmpty()) {
-            return new ResponseEntity("Product name cannot be null or empty", HttpStatus.BAD_REQUEST);
-        }
-        if (productRequest.getCategoryId() == null) {
-            return new ResponseEntity("Category ID cannot be null", HttpStatus.BAD_REQUEST);
-        }
-        if (productRequest.getPrice() == null || productRequest.getPrice() <= 0) {
-            return new ResponseEntity("Price must be a positive value", HttpStatus.BAD_REQUEST);
-        }
-        if (productRequest.getQuantity() == null || productRequest.getQuantity() < 0) {
-            return new ResponseEntity("Quantity cannot be null or negative", HttpStatus.BAD_REQUEST);
-        }
-        if (productRequest.getImage() == null || productRequest.getImage().isEmpty()) {
-            return new ResponseEntity("Image URL cannot be null or empty", HttpStatus.BAD_REQUEST);
-        }
 
+    public ResponseEntity<Product> createProduct(ProductRequest productRequest) {
+        // Thiết lập Category cho ProductDetail
+        Category category = categoryRepository.findCategoryById(productRequest.getCategoryId());
+        if (category == null) {
+            String message = "Category not exists: ";
+            System.out.println(message + productRequest.getCategoryId());
+            return new ResponseEntity(message, HttpStatus.NO_CONTENT);
+        }
         // Kiểm tra sản phẩm đã tồn tại
         Product existingProduct = productRepository.findByProductName(productRequest.getProductName());
         if (existingProduct != null) {
@@ -75,9 +70,6 @@ public class ProductService {
         productDetail.setPrice(productRequest.getPrice());
         productDetail.setQuantity(productRequest.getQuantity());
 
-        // Thiết lập Category cho ProductDetail
-        Category category = new Category();
-        category.setId(productRequest.getCategoryId());
         productDetail.setCategory(category);
 
         // Lưu sản phẩm và chi tiết sản phẩm vào cơ sở dữ liệu
@@ -87,9 +79,6 @@ public class ProductService {
 
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
-
-
-
 
     public ResponseEntity<Product> updateProduct(ProductRequest productRequest) {
         Long productId = productRepository.findIdByProductId(productRequest.getId());
@@ -112,15 +101,17 @@ public class ProductService {
             existingProduct.setProductName(productRequest.getProductName());
         }
         if (productRequest.getCategoryId() != null) {
-            // Tạo đối tượng Category mới từ categoryId
-            Category category = new Category();
-            category.setId(productRequest.getCategoryId());
+            Long categoryId = productRequest.getCategoryId();
+            Category category = categoryRepository.findCategoryById(categoryId);
+            if (category == null) {
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            }
             productDetail.setCategory(category);
         }
         if (productRequest.getPrice() != null) {
             productDetail.setPrice(productRequest.getPrice());
         }
-        if (productRequest.getQuantity() != null){
+        if (productRequest.getQuantity() != null) {
             productDetail.setQuantity(productRequest.getQuantity());
         }
         if (productRequest.getImage() != null) {
@@ -135,11 +126,9 @@ public class ProductService {
     }
 
 
-
-
-    public ResponseEntity<String> deleteProduct(Long id){
+    public ResponseEntity<String> deleteProduct(Long id) {
         Long productId = productRepository.findIdByProductId(id);
-        if (productId == null){
+        if (productId == null) {
             String message = "product id not found";
             System.out.println(message + productId);
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
@@ -151,7 +140,7 @@ public class ProductService {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    public ResponseEntity<List<ProductDetail>> listProductDetailByHot(){
+    public ResponseEntity<List<ProductDetail>> listProductDetailByHot() {
         return new ResponseEntity<>(productDetailRepository.findByIsHot(1L), HttpStatus.OK);
     }
 }

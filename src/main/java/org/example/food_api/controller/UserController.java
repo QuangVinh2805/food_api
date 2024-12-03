@@ -3,6 +3,8 @@ package org.example.food_api.controller;
 import org.example.food_api.models.User;
 import org.example.food_api.models.User;
 import org.example.food_api.repository.UserRepository;
+import org.example.food_api.request.LoginRequest;
+import org.example.food_api.request.UserRequest;
 import org.example.food_api.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,7 @@ public class UserController {
 //    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<User> findUserLogin(@RequestBody Map<String, String> request) {
+    public ResponseEntity<User> findUserLogin(@RequestBody LoginRequest request) {
         return userService.findUserLogin(request);
     }
     @DeleteMapping("/delete/{id}")
@@ -62,8 +64,8 @@ public class UserController {
         return userService.updateUser(user);
     }
     @PostMapping("/create")
-    public void createUser(@RequestBody User user) {
-        userService.save(user);
+    public ResponseEntity<User> createUser(@RequestBody UserRequest request) {
+        return userService.createUser(request);
     }
 
 

@@ -1,6 +1,5 @@
 package org.example.food_api.repository;
 
-import org.example.food_api.models.Cart;
 import org.example.food_api.models.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +11,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Override
     List<Customer> findAll();
 
-    @Query(value = "select c.id from Customer c where c.id = :id",nativeQuery = false)
+    @Query(value = "select c.id from Customer c where c.id = :id", nativeQuery = false)
     Long findIdByCustomerId(@Param("id") Long id);
+
+    Customer findCustomerById(Long id);
 
     Customer findByCustomerName(String customerName);
 

@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Override
     List<Order> findAll();
-    Order findById(long id);
+    Order findOrderById(long id);
 
     @Query(value = "select o.id from Order o where o.id = :id",nativeQuery = false)
     Long findIdByOrderId(@Param("id") Long id);

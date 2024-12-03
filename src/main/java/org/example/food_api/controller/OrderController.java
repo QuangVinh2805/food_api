@@ -1,10 +1,9 @@
 package org.example.food_api.controller;
 
 import org.example.food_api.models.Order;
-import org.example.food_api.models.Order;
-import org.example.food_api.models.Order;
-import org.example.food_api.models.Order;
+import org.example.food_api.models.OrderDetail;
 import org.example.food_api.repository.OrderRepository;
+import org.example.food_api.request.OrderRequest;
 import org.example.food_api.services.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/order")
@@ -27,13 +25,15 @@ public class OrderController {
     private OrderRepository orderRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<Order>> listAllOrder(){
+    public ResponseEntity<List<Order>> listAllOrder() {
         return orderService.listAllOrder();
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable("id") long id) {
         return orderService.deleteOrder(id);
     }
+
     @DeleteMapping("/deleteAll")
     public ResponseEntity<HttpStatus> deleteAllOrder() {
         try {
@@ -43,12 +43,14 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping("/update")
-    public ResponseEntity<Order> updateOrder(@RequestBody Order order) {
-        return orderService.updateOrder(order);
+    public ResponseEntity<OrderDetail> updateOrder(@RequestBody OrderRequest request) {
+        return orderService.updateOrder(request);
     }
+
     @PostMapping("/create")
-    public void createOrder(@RequestBody Order order) {
-        orderService.save(order);
+    public ResponseEntity<OrderDetail> createOrder(@RequestBody OrderRequest orderRequest) {
+        return orderService.createOrder(orderRequest);
     }
 }

@@ -14,7 +14,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Override
     List<Category> findAll();
 
-    Category findById(long id);
+    Category findCategoryById(long id);
 
     @Query(value = "select c.id from Category c where c.id = :id",nativeQuery = false)
     Long findIdByCategoryId(@Param("id") Long id);

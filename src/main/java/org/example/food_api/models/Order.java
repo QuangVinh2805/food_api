@@ -4,19 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "`order`")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Order {
     @Id
     @Column(name = "id", nullable = false)
@@ -27,12 +28,12 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @NotNull
     @Column(name = "total_price", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalPrice;
+    private Long totalPrice;
 
     @Size(max = 255)
     @Column(name = "address")
@@ -40,19 +41,9 @@ public class Order {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Date createdAt;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    public Order() {}
-
-    public Order(Customer customer, BigDecimal totalPrice, String address, Instant createdAt, Instant updatedAt) {
-        this.customer = customer;
-        this.totalPrice = totalPrice;
-        this.address = address;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    private Date updatedAt;
 }

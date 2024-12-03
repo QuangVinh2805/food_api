@@ -2,10 +2,8 @@ package org.example.food_api.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
 import java.util.Date;
@@ -16,6 +14,8 @@ import java.util.Date;
 @Table(name = "user")
 @AllArgsConstructor
 @NoArgsConstructor
+@DynamicUpdate
+@Builder
 public class User {
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_USER = 2;
@@ -55,6 +55,6 @@ public class User {
     @Column(name = "verification_code", length = 100)
     private String verificationCode;
 
-    @Column(name = "phone",length = 100)
+    @Column(name = "phone", length = 100)
     private Long phoneNumber;
 }
