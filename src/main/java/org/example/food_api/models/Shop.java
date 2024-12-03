@@ -40,4 +40,14 @@ public class Shop implements Serializable {
     @Column(name = "close_time")
     private Instant closeTime;
 
+    public Shop() {}
+
+    public Shop(String shopName, String shopImage, String shopAddress, Instant openTime, Instant closeTime) {
+        this.shopName = shopName;
+        this.shopImage = shopImage;
+        this.shopAddress = shopAddress;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+    }
+
 }

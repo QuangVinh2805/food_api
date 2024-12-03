@@ -1,9 +1,6 @@
 package org.example.food_api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +15,7 @@ import java.time.LocalDate;
 public class Report {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -35,5 +33,14 @@ public class Report {
     @NotNull
     @Column(name = "profit", nullable = false, precision = 15, scale = 2)
     private BigDecimal profit;
+
+    public Report() {}
+
+    public Report(LocalDate reportDate, Integer quantityOrder, BigDecimal revenue, BigDecimal profit) {
+        this.reportDate = reportDate;
+        this.quantityOrder = quantityOrder;
+        this.revenue = revenue;
+        this.profit = profit;
+    }
 
 }

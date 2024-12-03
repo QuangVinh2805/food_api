@@ -19,13 +19,14 @@ import java.time.Instant;
 public class OrderDetail {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_detail_id", nullable = false)
     private Product product;
 
     @NotNull

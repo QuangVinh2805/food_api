@@ -1,9 +1,6 @@
 package org.example.food_api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -19,6 +16,7 @@ import java.time.Instant;
 public class Customer {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 200)
@@ -60,5 +58,18 @@ public class Customer {
     @ColumnDefault("0")
     @Column(name = "status", nullable = false)
     private Byte status;
+
+    public Customer() {}
+
+    public Customer(String avatar,String gender,String password,Instant birthday,String customerName,String address,String phone,String email) {
+        this.avatar = avatar;
+        this.gender = gender;
+        this.password = password;
+        this.birthday = birthday;
+        this.customerName = customerName;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+    }
 
 }

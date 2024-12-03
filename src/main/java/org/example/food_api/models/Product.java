@@ -2,10 +2,14 @@ package org.example.food_api.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -14,17 +18,15 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "product")
+@AllArgsConstructor
+@NoArgsConstructor
+@DynamicUpdate
 public class Product implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "shop_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-
-    private Shop shop;
 
     @Size(max = 200)
     @NotNull
@@ -33,7 +35,7 @@ public class Product implements Serializable {
 
     @Size(max = 200)
     @Column(name = "rate", length = 200)
-    private String rate;
+    private Long rate;
 
     @Column(name = "create_at")
     private Instant createAt;
@@ -43,6 +45,7 @@ public class Product implements Serializable {
 
     @Size(max = 100)
     @Column(name = "image", length = 100)
-    private String Image;
+    private String image;
+
 
 }

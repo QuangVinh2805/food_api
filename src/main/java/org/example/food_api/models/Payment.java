@@ -16,6 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Payment {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -39,5 +40,14 @@ public class Payment {
     @Size(max = 20)
     @Column(name = "payment_type", length = 20)
     private String paymentType;
+
+    public Payment() {}
+
+    public Payment(Order order, Customer customer, @NotNull String cardNumber, @NotNull String paymentType) {
+        this.order = order;
+        this.customer = customer;
+        this.cardNumber = cardNumber;
+        this.paymentType = paymentType;
+    }
 
 }

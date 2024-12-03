@@ -1,9 +1,6 @@
 package org.example.food_api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +14,7 @@ import java.time.Instant;
 public class Category {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 100)
@@ -32,5 +30,14 @@ public class Category {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    public Category() {}
+
+    public Category(String categoryName, String icon, Instant createdAt, Instant updatedAt) {
+        this.categoryName = categoryName;
+        this.icon = icon;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
 }

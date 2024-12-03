@@ -16,6 +16,7 @@ import java.time.Instant;
 public class Notification {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -34,5 +35,14 @@ public class Notification {
     @ColumnDefault("current_timestamp()")
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    public Notification() {}
+
+    public Notification(String content, String label, Instant createdAt, Instant updatedAt) {
+        this.content = content;
+        this.label = label;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
 }

@@ -1,24 +1,27 @@
 package org.example.food_api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "user")
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_USER = 2;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -31,7 +34,7 @@ public class User {
     private String password;
 
     @Column(name = "birthday")
-    private Instant birthday;
+    private Date birthday;
 
     @Size(max = 100)
     @Column(name = "name", length = 100)
@@ -48,5 +51,10 @@ public class User {
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
+    @Size(max = 100)
+    @Column(name = "verification_code", length = 100)
+    private String verificationCode;
 
+    @Column(name = "phone",length = 100)
+    private Long phoneNumber;
 }

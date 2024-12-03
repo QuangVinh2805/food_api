@@ -30,4 +30,10 @@ public class Banner {
     @Column(name = "content")
     private String content;
 
+    public Banner() {}
+    public Banner(String image, Byte status, String content) {
+        this.image = image;
+        this.status = status;
+        this.content = content;
+    }
 }

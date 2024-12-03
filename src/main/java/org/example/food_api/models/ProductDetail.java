@@ -16,6 +16,7 @@ import java.io.Serializable;
 public class ProductDetail implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -26,14 +27,22 @@ public class ProductDetail implements Serializable {
 
     @NotNull
     @Column(name = "price", nullable = false)
-    private Integer price;
+    private Long price;
 
     @NotNull
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Long quantity;
 
     @Size(max = 200)
     @Column(name = "description", length = 200)
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Category category;
+
+    @Column(name = "is_hot")
+    private Long isHot;
 
 }

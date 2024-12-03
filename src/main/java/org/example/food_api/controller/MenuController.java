@@ -24,4 +24,5 @@ public class MenuController {
     public ResponseEntity<List<Menu>> listAllMenu(){
         return menuService.listAllMenu();
     }
+
 }

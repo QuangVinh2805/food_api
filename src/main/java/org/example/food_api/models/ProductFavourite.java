@@ -18,6 +18,7 @@ import java.time.Instant;
 public class ProductFavourite {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

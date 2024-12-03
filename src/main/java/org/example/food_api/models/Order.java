@@ -20,6 +20,7 @@ import java.time.Instant;
 public class Order {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -45,4 +46,13 @@ public class Order {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    public Order() {}
+
+    public Order(Customer customer, BigDecimal totalPrice, String address, Instant createdAt, Instant updatedAt) {
+        this.customer = customer;
+        this.totalPrice = totalPrice;
+        this.address = address;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
