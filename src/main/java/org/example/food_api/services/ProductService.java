@@ -3,6 +3,7 @@ package org.example.food_api.services;
 import org.example.food_api.models.Category;
 import org.example.food_api.models.Product;
 import org.example.food_api.models.ProductDetail;
+import org.example.food_api.models.User;
 import org.example.food_api.repository.CategoryRepository;
 import org.example.food_api.repository.ProductDetailRepository;
 import org.example.food_api.repository.ProductRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -32,6 +34,14 @@ public class ProductService {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<List<Product>>(listProduct, HttpStatus.OK);
+    }
+
+    public List<ProductDetail> findProductDetailByProductId(Long productId) {
+        List<ProductDetail> productDetail = productDetailRepository.findProductDetailsByProductId(productId);
+        if (productDetail == null) {
+            ResponseEntity.notFound().build();
+        }
+        return productDetail;
     }
 
     public ResponseEntity<List<ProductDetail>> listAllProductDetail(int page, int size) {

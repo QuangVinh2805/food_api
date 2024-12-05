@@ -31,12 +31,13 @@ public class CartService {
     CartDetailRepository cartDetailRepository;
 
 
-    public ResponseEntity<List<Cart>> listAllCart(){
-        List<Cart> listCart= cartRepository.findAll();
+
+    public ResponseEntity<List<CartDetail>> listAllCart(){
+        List<CartDetail> listCart= cartDetailRepository.findAll();
         if(listCart.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<Cart>>(listCart, HttpStatus.OK);
+        return new ResponseEntity<List<CartDetail>>(listCart, HttpStatus.OK);
     }
     public void save(Cart cart){
         cartRepository.save(cart);

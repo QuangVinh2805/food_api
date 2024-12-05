@@ -1,11 +1,11 @@
 package org.example.food_api.controller;
 
+import org.example.food_api.models.*;
 import org.example.food_api.models.Product;
-import org.example.food_api.models.Product;
-import org.example.food_api.models.ProductDetail;
 import org.example.food_api.models.Product;
 import org.example.food_api.repository.ProductDetailRepository;
 import org.example.food_api.repository.ProductRepository;
+import org.example.food_api.request.ProductDetailRequest;
 import org.example.food_api.request.ProductRequest;
 import org.example.food_api.services.ProductService;
 import org.example.food_api.services.ProductService;
@@ -44,6 +44,59 @@ public class ProductController {
 
         return productService.listAllProductDetail(page, size);
     }
+
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<List<ProductDetail>> findProductDetailsByProductId(@PathVariable("productId") long productId) {
+        Product product = new Product();
+        product.setId(productId);  // Giả sử bạn đã có phương thức `setId()` trong `Product`
+
+        List<ProductDetail> productDetails = productDetailRepository.findByProduct(product);
+        if (productDetails.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(productDetails);
+    }
+
+//    @GetMapping("/{productId}")
+//    public ProductDetail findProductDetailsByProductId(@PathVariable("product") Long product) {
+//        ProductDetail productDetails = productService.findProductDetailByProductId(product);
+//        return productService.findProductDetailByProductId(product);
+//    }
+//    @RequestMapping(value = "/{product}", method = RequestMethod.GET)
+//    public ProductDetail findProductDetailByProductId(@PathVariable("product") Product product) {
+//        return productService.findProductDetailByProductId(product);
+//    }
+//    @GetMapping("/{productId}")
+//    public ResponseEntity<List<ProductDetail>> findProductDetailsByProductId(@PathVariable("productId") long productId) {
+//        List<ProductDetail> productDetails = productDetailRepository.findPDByProductId(productId);
+//        if (productDetails.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(productDetails);
+//    }
+//@GetMapping("/{productId}")
+//public ResponseEntity<?> findProductDetailsByProductId(@PathVariable("productId") String productIdStr) {
+//    if (productIdStr == null || productIdStr.equals("undefined")) {
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                .body("Product ID cannot be undefined or null.");
+//    }
+//
+//    try {
+//        long productId = Long.parseLong(productIdStr);
+//        List<ProductDetail> productDetails = productDetailRepository.findPDByProductId(productId);
+//
+//        if (productDetails.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(productDetails);
+//    } catch (NumberFormatException e) {
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                .body("Invalid product ID format: " + productIdStr);
+//    }
+//}
+
+
 //    public ResponseEntity<List<ProductDetail>> listAllProductDetail(@RequestParam(defaultValue = "0") int page,
 //                                                                    @RequestParam(defaultValue = "10") int size){
 //

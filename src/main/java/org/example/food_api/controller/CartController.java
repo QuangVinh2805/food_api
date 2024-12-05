@@ -30,7 +30,7 @@ public class CartController {
     private CartRepository cartRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<Cart>> listAllCart(){
+    public ResponseEntity<List<CartDetail>> listAllCart(){
         return cartService.listAllCart();
     }
     @DeleteMapping("/delete/{id}")

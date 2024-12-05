@@ -129,21 +129,33 @@ public class UserService {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
-        Long userId = userRepository.findIdByUserId(user.getId());
-        if (userId == null) {
-            String message = "User ID not found";
-            System.out.println(message + userId);
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        }
-        String username = user.getUsername();
-        if (userRepository.findByUsername(username) != null) {
-            String message = "Username đã tồn tại";
-            System.out.println(message + userId);
+        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        if (existingUser == null) {
+            String message = "User ID not found: " + user.getId();
+            System.out.println(message);
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
 
-        userRepository.save(user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        // Kiểm tra nếu username bị trùng (nhưng cho phép giữ nguyên username cũ)
+        if (!existingUser.getUsername().equals(user.getUsername())) {
+            if (userRepository.findByUsername(user.getUsername()) != null) {
+                String message = "Username đã tồn tại: " + user.getUsername();
+                System.out.println(message);
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            }
+        }
+
+        // Cập nhật user trong database
+        existingUser.setName(user.getName());
+        existingUser.setBirthday(user.getBirthday());
+        existingUser.setPhoneNumber(user.getPhoneNumber());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setAddress(user.getAddress());
+        // Không cập nhật lại username nếu không thay đổi
+        existingUser.setUsername(user.getUsername());
+
+        userRepository.save(existingUser);
+        return new ResponseEntity<>(existingUser, HttpStatus.OK);
     }
 
     public ResponseEntity<User> createUser(UserRequest request) {
