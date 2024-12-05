@@ -9,7 +9,5 @@ import java.util.List;
 public class OrderRequest {
     private Long orderId;
     private Long userId;
-    private List<Long> productDetailId;
-    private Long quantity;
     private String address;
 }

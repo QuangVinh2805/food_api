@@ -1,14 +1,8 @@
 package org.example.food_api.services;
 
 
-import org.example.food_api.models.Order;
-import org.example.food_api.models.OrderDetail;
-import org.example.food_api.models.ProductDetail;
-import org.example.food_api.models.User;
-import org.example.food_api.repository.OrderDetailRepository;
-import org.example.food_api.repository.OrderRepository;
-import org.example.food_api.repository.ProductDetailRepository;
-import org.example.food_api.repository.UserRepository;
+import org.example.food_api.models.*;
+import org.example.food_api.repository.*;
 import org.example.food_api.request.OrderRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +25,12 @@ public class OrderService {
     UserRepository userRepository;
 
     @Autowired
+    CartDetailRepository cartDetailRepository;
+
+    @Autowired
+    CartRepository cartRepository;
+
+    @Autowired
     ProductDetailRepository productDetailRepository;
 
     public ResponseEntity<List<Order>> listAllOrder() {
@@ -48,20 +48,8 @@ public class OrderService {
     public ResponseEntity<OrderDetail> updateOrder(OrderRequest request) {
         Long orderId = request.getOrderId();
         Long userId = request.getUserId();
-        List<Long> productDetailIds = request.getProductDetailId();
-        Long orderQuantity = request.getQuantity();
         String address = request.getAddress();
 
-        if (userId == null || productDetailIds.isEmpty() || orderQuantity == null) {
-            String message = "Customer or product or orderQuantity null";
-            System.out.println(message);
-            return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-        }
-        if (orderQuantity <= 0) {
-            String message = "Số lượng phải lớn hơn 0";
-            System.out.println(message);
-            return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-        }
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             String message = "User null";
@@ -69,104 +57,71 @@ public class OrderService {
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
         List<OrderDetail> orderDetails = new ArrayList<>();
-        for (Long productDetailId : productDetailIds) {
-            ProductDetail productDetail = productDetailRepository.findByProductId(productDetailId);
-            if (productDetail == null) {
-                String message = "product null";
-                System.out.println(message);
-                return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-            }
+        List<CartDetail> cartDetails = cartDetailRepository.findByUserId(userId);
+        for (CartDetail cartDetail : cartDetails) {
+            Order order = Order.builder()
+                    .user(user)
+                    .totalPrice(cartDetail.getTotalPrice())
+                    .address(request.getAddress())
+                    .createdAt(new Date())
+                    .build();
+            orderRepository.save(order);
 
-            if (orderQuantity > productDetail.getQuantity()) {
-                String message = "Hết hàng";
-                System.out.println(message);
-                return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-            }
-            productDetail.setQuantity(productDetail.getQuantity() - orderQuantity);
-            productDetailRepository.save(productDetail);
-            Long totalPrice = orderQuantity * productDetail.getPrice();
-
-            Order order = orderRepository.findOrderById(request.getOrderId());
-            if (order == null) {
-                String message = "Đơn hàng không tồn tại";
-                System.out.println(message);
-                return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-            }
-            order.setTotalPrice(totalPrice);
-            order.setAddress(address);
-
-            OrderDetail orderDetail = orderDetailRepository.findOrderDetailByOrder(order);
-            orderDetail.setTotalPrice(totalPrice);
-            orderDetail.setQuantity(orderQuantity);
-            orderDetail.setProductDetail(productDetail);
+            OrderDetail orderDetail = OrderDetail.builder()
+                    .productDetail(productDetailRepository.findByProductId(cartDetail.getCart().getProduct().getId()))
+                    .order(order)
+                    .quantity(cartDetail.getQuantity())
+                    .totalPrice(cartDetail.getTotalPrice())
+                    .createdAt(new Date())
+                    .build();
             orderDetails.add(orderDetail);
             orderDetailRepository.saveAll(orderDetails);
         }
-
-
         return new ResponseEntity(orderDetails, HttpStatus.OK);
     }
 
     public ResponseEntity<OrderDetail> createOrder(OrderRequest request) {
         Long userId = request.getUserId();
-        List<Long> productDetailIds = request.getProductDetailId();
-        Long orderQuantity = request.getQuantity();
         String address = request.getAddress();
 
-        if (userId == null || productDetailIds.isEmpty() || orderQuantity == null) {
-            String message = "Customer or product or orderQuantity null";
+        if (userId == null) {
+            String message = "userId null";
             System.out.println(message);
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
-        if (orderQuantity <= 0) {
-            String message = "Số lượng phải lớn hơn 0";
-            System.out.println(message);
-            return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-        }
+
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             String message = "User null";
             System.out.println(message);
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
+
         List<OrderDetail> orderDetails = new ArrayList<>();
-
-        for (Long productDetailId : productDetailIds) {
-            ProductDetail productDetail = productDetailRepository.findByProductId(productDetailId);
-            if (productDetail == null) {
-                String message = "product null";
-                System.out.println(message);
-                return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-            }
-
-            if (orderQuantity > productDetail.getQuantity()) {
-                String message = "Hết hàng";
-                System.out.println(message);
-                return new ResponseEntity(message, HttpStatus.FORBIDDEN);
-            }
-            productDetail.setQuantity(productDetail.getQuantity() - orderQuantity);
-            productDetailRepository.save(productDetail);
-
-
-            Long totalPrice = orderQuantity * productDetail.getPrice();
-            Order order = Order.builder()
-                    .createdAt(new Date())
-                    .totalPrice(totalPrice)
-                    .address(address)
-                    .user(user)
-                    .build();
-            orderRepository.save(order);
-
+        List<CartDetail> cartDetails = cartDetailRepository.findByUserId(userId);
+        Long totalPrice = 0L;
+        Order order = Order.builder()
+                .user(user)
+                .address(request.getAddress())
+                .createdAt(new Date())
+                .build();
+        orderRepository.save(order);
+        for (CartDetail cartDetail : cartDetails) {
             OrderDetail orderDetail = OrderDetail.builder()
-                    .createdAt(new Date())
-                    .totalPrice(totalPrice)
-                    .productDetail(productDetail)
-                    .quantity(orderQuantity)
+                    .productDetail(productDetailRepository.findByProductId(cartDetail.getCart().getProduct().getId()))
                     .order(order)
+                    .quantity(cartDetail.getQuantity())
+                    .totalPrice(cartDetail.getTotalPrice())
+                    .createdAt(new Date())
                     .build();
             orderDetails.add(orderDetail);
+            totalPrice += orderDetail.getTotalPrice();
             orderDetailRepository.saveAll(orderDetails);
         }
+        order.setTotalPrice(totalPrice);
+        orderRepository.save(order);
+        List<Cart> carts = cartRepository.findByUserId(userId);
+        cartRepository.deleteAll(carts);
 
         return new ResponseEntity(orderDetails, HttpStatus.OK);
     }

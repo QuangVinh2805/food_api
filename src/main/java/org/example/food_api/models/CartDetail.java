@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
 import java.util.Date;
 
 @Getter
@@ -30,7 +31,6 @@ public class CartDetail {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
-
 
     @NotNull
     @Column(name = "quantity", nullable = false)

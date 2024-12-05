@@ -9,15 +9,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CartRepository extends JpaRepository<Cart,Long> {
+public interface CartRepository extends JpaRepository<Cart, Long> {
     @Override
     List<Cart> findAll();
+
     Cart findById(long id);
 
-    @Query(value = "select c.id from Cart c where c.id = :id",nativeQuery = false)
+    @Query(value = "select c.id from Cart c where c.id = :id", nativeQuery = false)
     Long findIdByCartId(@Param("id") Long id);
 
     Cart findByUserIdAndProductId(Long userId, Long productId);
 
-
+    List<Cart> findByUserId(Long userId);
 }

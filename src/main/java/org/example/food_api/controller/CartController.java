@@ -30,13 +30,20 @@ public class CartController {
     private CartRepository cartRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<CartDetail>> listAllCart(){
+    public ResponseEntity<List<CartDetail>> listAllCart() {
         return cartService.listAllCart();
     }
+
+    @RequestMapping(value = "/getCartByUser", method = RequestMethod.GET)
+    public ResponseEntity<List<CartDetail>> listCartByUser(@RequestParam Long userId) {
+        return cartService.listCartByUser(userId);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCart(@PathVariable("id") long id) {
         return cartService.deleteCart(id);
     }
+
     @DeleteMapping("/deleteAll")
     public ResponseEntity<HttpStatus> deleteAllCart() {
         try {
@@ -46,10 +53,12 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping("/update")
     public ResponseEntity<CartDetail> updateCart(@RequestBody CartRequest cartRequest) {
-        return cartService.createCart(cartRequest);
+        return cartService.updateCart(cartRequest);
     }
+
     @PostMapping("/create")
     public ResponseEntity<CartDetail> createCart(@RequestBody CartRequest cartRequest) {
         return cartService.createCart(cartRequest);

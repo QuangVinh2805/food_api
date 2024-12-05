@@ -31,8 +31,7 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @NotNull
-    @Column(name = "total_price", nullable = false, precision = 15, scale = 2)
+    @Column(name = "total_price", precision = 15, scale = 2)
     private Long totalPrice;
 
     @Size(max = 255)
