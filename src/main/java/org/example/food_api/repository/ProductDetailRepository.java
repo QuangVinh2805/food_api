@@ -21,7 +21,7 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     List<ProductDetail> findByProduct(Product product);
 
-    @Query(value = "select p from ProductDetail p where p.id = :id",nativeQuery = false)
+    @Query(value = "select * from product_detail p where p.product_id = :id",nativeQuery = true)
     ProductDetail findByProductId(@Param("id") Long id);
 
 //    @Query("SELECT p FROM ProductDetail p WHERE p.product = :productIdStr")

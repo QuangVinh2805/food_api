@@ -3,9 +3,7 @@ package org.example.food_api.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -17,6 +15,8 @@ import java.util.Date;
 @Entity
 @Table(name = "order_detail")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderDetail {
     @Id
     @Column(name = "id", nullable = false)

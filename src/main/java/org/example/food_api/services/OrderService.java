@@ -102,6 +102,9 @@ public class OrderService {
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
 
+        StringBuilder emailMessage = new StringBuilder();
+        emailMessage.append("Chúc mừng bạn đã đặt hàng thành công").append("\n");
+
         List<OrderDetail> orderDetails = new ArrayList<>();
         List<CartDetail> cartDetails = cartDetailRepository.findByUserId(userId);
         Long totalPrice = 0L;
@@ -111,9 +114,22 @@ public class OrderService {
                 .createdAt(new Date())
                 .build();
         orderRepository.save(order);
-        for (CartDetail cartDetail : cartDetails) {
+
+        //Chay vong for cart detail để thêm vào order
+        for (int i = 0; i < cartDetails.size(); i++) {
+            CartDetail cartDetail = cartDetails.get(i);
+            //Lấy ra sản phẩm trong cart detail
+            Product product = cartDetail.getCart().getProduct();
+
+            emailMessage.append("- ");
+            emailMessage.append(cartDetail.getQuantity()).append(" ");
+            emailMessage.append(product.getProductName());
+            emailMessage.append(":");
+            emailMessage.append(cartDetail.getTotalPrice()).append(" VND");
+            emailMessage.append("\n");
+
             OrderDetail orderDetail = OrderDetail.builder()
-                    .productDetail(productDetailRepository.findByProductId(cartDetail.getCart().getProduct().getId()))
+                    .productDetail(productDetailRepository.findByProductId(product.getId()))
                     .order(order)
                     .quantity(cartDetail.getQuantity())
                     .totalPrice(cartDetail.getTotalPrice())
@@ -123,19 +139,32 @@ public class OrderService {
             totalPrice += orderDetail.getTotalPrice();
             orderDetailRepository.saveAll(orderDetails);
         }
-
+        emailMessage.append("Tổng tiền đơn hàng: ").append(totalPrice);
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("vinhdaumoi2805.com");
+        if (user.getEmail() == null) {
+            user.setEmail("khanhlhfw@gmail.com");
+        }
         message.setTo(user.getEmail());
-        message.setSubject("Thông báo ");
-        message.setText("Chúc mừng bạn đã đặt hàng thành công");
-        emailSender.send(message);
+        message.setSubject("Thông báo đặt hàng thành công");
+        message.setText(emailMessage.toString());
+
+        new Thread(() -> emailSender.send(message)).start();
         List<Cart> carts = cartRepository.findByUserId(userId);
         cartRepository.deleteAll(carts);
 
         return new ResponseEntity(orderDetails, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<OrderDetail>> getOrders(Long userId) {
+        List<OrderDetail> orderDetails;
+        orderDetails = orderDetailRepository.getOrderDetailsByUserId(userId);
+        if (orderDetails.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(orderDetails);
     }
 
 

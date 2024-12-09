@@ -34,6 +34,11 @@ public class OrderController {
         return orderService.deleteOrder(id);
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<List<OrderDetail>> getOrders(@PathVariable("id") long id) {
+        return orderService.getOrders(id);
+    }
+
     @DeleteMapping("/deleteAll")
     public ResponseEntity<HttpStatus> deleteAllOrder() {
         try {
