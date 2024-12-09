@@ -48,10 +48,7 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<List<ProductDetail>> findProductDetailsByProductId(@PathVariable("productId") long productId) {
-        Product product = new Product();
-        product.setId(productId);  // Giả sử bạn đã có phương thức `setId()` trong `Product`
-
-        List<ProductDetail> productDetails = productDetailRepository.findByProduct(product);
+        List<ProductDetail> productDetails = productDetailRepository.findProductDetailsByProductId(productId);
         if (productDetails.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
