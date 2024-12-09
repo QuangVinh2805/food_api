@@ -113,8 +113,8 @@ public class UserService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("vinhdaumoi2805.com");
         message.setTo(user.getEmail());
-        message.setSubject("link chao mung");
-        message.setText("chao mung");
+        message.setSubject("Thông báo");
+        message.setText("Chúc mừng bạn đã đăng ký tài khoản thành công");
         emailSender.send(message);
 
         userRepository.save(user);
