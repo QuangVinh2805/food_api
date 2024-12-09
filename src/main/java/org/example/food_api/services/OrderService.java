@@ -7,6 +7,8 @@ import org.example.food_api.request.OrderRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class OrderService {
 
     @Autowired
     ProductDetailRepository productDetailRepository;
+
+    @Autowired
+    private JavaMailSender emailSender;
 
     public ResponseEntity<List<Order>> listAllOrder() {
         List<Order> listOrder = orderRepository.findAll();
@@ -118,8 +123,15 @@ public class OrderService {
             totalPrice += orderDetail.getTotalPrice();
             orderDetailRepository.saveAll(orderDetails);
         }
+
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("vinhdaumoi2805.com");
+        message.setTo(user.getEmail());
+        message.setSubject("Thông báo ");
+        message.setText("Chúc mừng bạn đã đặt hàng thành công");
+        emailSender.send(message);
         List<Cart> carts = cartRepository.findByUserId(userId);
         cartRepository.deleteAll(carts);
 
