@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
-    OrderDetail findOrderDetailByOrder(Order order);
+    List<OrderDetail> findOrderDetailByOrder(Order order);
 
-    @Query(value = "select * from order_detail od where order_id in (select id from `order` where user_id = :userId) order by order_id asc", nativeQuery = true)
+    @Query(value = "select * from order_detail od where order_id in (select id from `order` where user_id = :userId) order by order_id desc", nativeQuery = true)
     List<OrderDetail> getOrderDetailsByUserId(Long userId);
 }

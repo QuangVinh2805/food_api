@@ -1,13 +1,10 @@
 package org.example.food_api.controller;
 
-import org.example.food_api.models.*;
 import org.example.food_api.models.Product;
-import org.example.food_api.models.Product;
+import org.example.food_api.models.ProductDetail;
 import org.example.food_api.repository.ProductDetailRepository;
 import org.example.food_api.repository.ProductRepository;
-import org.example.food_api.request.ProductDetailRequest;
 import org.example.food_api.request.ProductRequest;
-import org.example.food_api.services.ProductService;
 import org.example.food_api.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -33,16 +29,18 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<Product>> listAllProduct(){
+    public ResponseEntity<List<Product>> listAllProduct() {
         return productService.listAllProduct();
     }
 
     @RequestMapping(value = "/alldetail", method = RequestMethod.GET)
-    public ResponseEntity<List<ProductDetail>> listAllProductDetail(@RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<List<ProductDetail>> listAllProductDetail(@RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "20") int size,
+                                                                    @RequestParam(required = false) Long status) {
         int totalProducts = (int) productDetailRepository.count();
-        int size = totalProducts; // Hiển thị toàn bộ sản phẩm
+        if (size == 0) size = totalProducts; // Hiển thị toàn bộ sản phẩm
 
-        return productService.listAllProductDetail(page, size);
+        return productService.listAllProductDetail(page, size, status);
     }
 
 
@@ -104,6 +102,7 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable("id") long id) {
         return productService.deleteProduct(id);
     }
+
     @DeleteMapping("/deleteAll")
     public ResponseEntity<HttpStatus> deleteAllProduct() {
         try {
@@ -113,6 +112,7 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping("/update")
     public ResponseEntity<Product> updateProduct(@RequestBody ProductRequest productRequest) {
         return productService.updateProduct(productRequest);
@@ -122,6 +122,7 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequest productRequest) {
         return productService.createProduct(productRequest);
     }
+
     @GetMapping("/hot")
     public ResponseEntity<List<ProductDetail>> hotProduct() {
         return productService.listProductDetailByHot();

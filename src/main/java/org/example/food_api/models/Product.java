@@ -1,8 +1,6 @@
 package org.example.food_api.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -36,6 +34,10 @@ public class Product implements Serializable {
     @Size(max = 200)
     @Column(name = "rate", length = 200)
     private Long rate;
+
+    @Size(max = 1)
+    @Column(name = "status", length = 1)
+    private Long status;
 
     @Column(name = "create_at")
     private Instant createAt;

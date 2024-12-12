@@ -2,7 +2,8 @@ package org.example.food_api.repository;
 
 import org.example.food_api.models.Product;
 import org.example.food_api.models.ProductDetail;
-import org.example.food_api.request.ProductDetailRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     List<ProductDetail> findByProduct(Product product);
 
-    @Query(value = "select * from product_detail p where p.product_id = :id",nativeQuery = true)
+    @Query(value = "select * from product_detail p where p.product_id = :id", nativeQuery = true)
     ProductDetail findByProductId(@Param("id") Long id);
 
 //    @Query("SELECT p FROM ProductDetail p WHERE p.product = :productIdStr")
@@ -29,5 +30,7 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     @Query("SELECT pd FROM ProductDetail pd WHERE pd.product.id = :productId")
     List<ProductDetail> findProductDetailsByProductId(@Param("productId") long productId);
+
+    Page<ProductDetail> findByStatus(Pageable pageable, Long status);
 
 }

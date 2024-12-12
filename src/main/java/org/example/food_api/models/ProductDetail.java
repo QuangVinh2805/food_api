@@ -30,6 +30,10 @@ public class ProductDetail implements Serializable {
     private Long price;
 
     @NotNull
+    @Column(name = "status", nullable = false)
+    private Long status;
+
+    @NotNull
     @Column(name = "quantity", nullable = false)
     private Long quantity;
 

@@ -3,7 +3,6 @@ package org.example.food_api.services;
 import org.example.food_api.models.Category;
 import org.example.food_api.models.Product;
 import org.example.food_api.models.ProductDetail;
-import org.example.food_api.models.User;
 import org.example.food_api.repository.CategoryRepository;
 import org.example.food_api.repository.ProductDetailRepository;
 import org.example.food_api.repository.ProductRepository;
@@ -12,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -44,13 +43,21 @@ public class ProductService {
         return productDetail;
     }
 
-    public ResponseEntity<List<ProductDetail>> listAllProductDetail(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ProductDetail> pagedResult = productDetailRepository.findAll(pageable);
+    public ResponseEntity<List<ProductDetail>> listAllProductDetail(int page, int size, Long status) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<ProductDetail> pagedResult;
+
+        if (status != null) {
+            pagedResult = productDetailRepository.findByStatus(pageable, status);
+        } else {
+            pagedResult = productDetailRepository.findAll(pageable);
+        }
 
         if (pagedResult.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
         return new ResponseEntity<>(pagedResult.getContent(), HttpStatus.OK);
     }
 
@@ -72,6 +79,7 @@ public class ProductService {
 
         // Tạo đối tượng Product từ ProductRequest
         Product product = new Product();
+        product.setStatus(1L);
         product.setProductName(productRequest.getProductName());
         product.setImage(productRequest.getImage());
 
@@ -93,7 +101,7 @@ public class ProductService {
     public ResponseEntity<Product> updateProduct(ProductRequest productRequest) {
         Long productId = productRepository.findIdByProductId(productRequest.getId());
         if (productId == null) {
-            String message = "product id not found";
+            String message = "product id " + productId + " not found";
             System.out.println(message + productId);
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
@@ -109,6 +117,9 @@ public class ProductService {
         // Cập nhật các trường không phải null
         if (productRequest.getProductName() != null) {
             existingProduct.setProductName(productRequest.getProductName());
+        }
+        if (productRequest.getStatus() != null) {
+            existingProduct.setStatus(productRequest.getStatus());
         }
         if (productRequest.getCategoryId() != null) {
             Long categoryId = productRequest.getCategoryId();
@@ -145,8 +156,20 @@ public class ProductService {
 
         }
         ProductDetail productDetail = productDetailRepository.findByProductId(productId);
-        productDetailRepository.delete(productDetail);
-        productRepository.deleteById(productId);
+        if (productDetail.getStatus() == 0L) {
+            productDetail.setStatus(1L);
+        } else {
+            productDetail.setStatus(0L);
+        }
+
+        productDetailRepository.save(productDetail);
+        Product product = productRepository.findByProductId(productId);
+        if (product.getStatus() == 0L) {
+            product.setStatus(1L);
+        } else {
+            product.setStatus(0L);
+        }
+        productRepository.save(product);
         return new ResponseEntity(HttpStatus.OK);
     }
 

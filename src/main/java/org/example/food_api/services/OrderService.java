@@ -53,35 +53,26 @@ public class OrderService {
     public ResponseEntity<OrderDetail> updateOrder(OrderRequest request) {
         Long orderId = request.getOrderId();
         Long userId = request.getUserId();
+        Long status = request.getStatus();
         String address = request.getAddress();
 
         User user = userRepository.findByUserId(userId);
+        Order order = orderRepository.findOrderById(orderId);
         if (user == null) {
             String message = "User null";
             System.out.println(message);
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
-        List<OrderDetail> orderDetails = new ArrayList<>();
-        List<CartDetail> cartDetails = cartDetailRepository.findByUserId(userId);
-        for (CartDetail cartDetail : cartDetails) {
-            Order order = Order.builder()
-                    .user(user)
-                    .totalPrice(cartDetail.getTotalPrice())
-                    .address(request.getAddress())
-                    .createdAt(new Date())
-                    .build();
-            orderRepository.save(order);
 
-            OrderDetail orderDetail = OrderDetail.builder()
-                    .productDetail(productDetailRepository.findByProductId(cartDetail.getCart().getProduct().getId()))
-                    .order(order)
-                    .quantity(cartDetail.getQuantity())
-                    .totalPrice(cartDetail.getTotalPrice())
-                    .createdAt(new Date())
-                    .build();
-            orderDetails.add(orderDetail);
-            orderDetailRepository.saveAll(orderDetails);
+        if (order == null) {
+            String message = "Order null";
+            System.out.println(message);
+            return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
+        order.setStatus(status);
+        orderRepository.save(order);
+        List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrder(order);
+
         return new ResponseEntity(orderDetails, HttpStatus.OK);
     }
 
@@ -102,6 +93,13 @@ public class OrderService {
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
 
+        String cartDetailIds = request.getCartDetailIds();
+        if (cartDetailIds == null || cartDetailIds.isEmpty()) {
+            String message = "Bạn chưa chọn sản phẩm để thanh toán";
+            System.out.println(message);
+            return new ResponseEntity(message, HttpStatus.FORBIDDEN);
+        }
+
         StringBuilder emailMessage = new StringBuilder();
         emailMessage.append("Chúc mừng bạn đã đặt hàng thành công").append("\n");
 
@@ -115,29 +113,32 @@ public class OrderService {
                 .build();
         orderRepository.save(order);
 
+        List<Cart> carts = new ArrayList<>();
         //Chay vong for cart detail để thêm vào order
         for (int i = 0; i < cartDetails.size(); i++) {
             CartDetail cartDetail = cartDetails.get(i);
             //Lấy ra sản phẩm trong cart detail
-            Product product = cartDetail.getCart().getProduct();
+            if (cartDetailIds.contains(cartDetail.getId().toString())) {
+                Product product = cartDetail.getCart().getProduct();
+                carts.add(cartDetail.getCart());
+                emailMessage.append("- ");
+                emailMessage.append(cartDetail.getQuantity()).append(" ");
+                emailMessage.append(product.getProductName());
+                emailMessage.append(":");
+                emailMessage.append(cartDetail.getTotalPrice()).append(" VND");
+                emailMessage.append("\n");
 
-            emailMessage.append("- ");
-            emailMessage.append(cartDetail.getQuantity()).append(" ");
-            emailMessage.append(product.getProductName());
-            emailMessage.append(":");
-            emailMessage.append(cartDetail.getTotalPrice()).append(" VND");
-            emailMessage.append("\n");
-
-            OrderDetail orderDetail = OrderDetail.builder()
-                    .productDetail(productDetailRepository.findByProductId(product.getId()))
-                    .order(order)
-                    .quantity(cartDetail.getQuantity())
-                    .totalPrice(cartDetail.getTotalPrice())
-                    .createdAt(new Date())
-                    .build();
-            orderDetails.add(orderDetail);
-            totalPrice += orderDetail.getTotalPrice();
-            orderDetailRepository.saveAll(orderDetails);
+                OrderDetail orderDetail = OrderDetail.builder()
+                        .productDetail(productDetailRepository.findByProductId(product.getId()))
+                        .order(order)
+                        .quantity(cartDetail.getQuantity())
+                        .totalPrice(cartDetail.getTotalPrice())
+                        .createdAt(new Date())
+                        .build();
+                orderDetails.add(orderDetail);
+                totalPrice += orderDetail.getTotalPrice();
+                orderDetailRepository.saveAll(orderDetails);
+            }
         }
         emailMessage.append("Tổng tiền đơn hàng: ").append(totalPrice);
         order.setTotalPrice(totalPrice);
@@ -152,7 +153,6 @@ public class OrderService {
         message.setText(emailMessage.toString());
 
         new Thread(() -> emailSender.send(message)).start();
-        List<Cart> carts = cartRepository.findByUserId(userId);
         cartRepository.deleteAll(carts);
 
         return new ResponseEntity(orderDetails, HttpStatus.OK);
