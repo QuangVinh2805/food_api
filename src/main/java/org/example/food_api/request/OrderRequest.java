@@ -10,4 +10,5 @@ public class OrderRequest {
     private Long orderId;
     private Long userId;
     private String address;
+    private Long status;
 }

@@ -1,5 +1,6 @@
 package org.example.food_api.services;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.example.food_api.models.User;
 import org.example.food_api.repository.UserRepository;
 import org.example.food_api.request.LoginRequest;
@@ -110,12 +111,6 @@ public class UserService {
             throw new IllegalArgumentException("Phone number must be a positive number");
         }
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("vinhdaumoi2805.com");
-        message.setTo(user.getEmail());
-        message.setSubject("Thông báo");
-        message.setText("Chúc mừng bạn đã đăng ký tài khoản thành công");
-        emailSender.send(message);
 
         userRepository.save(user);
     }
@@ -180,6 +175,19 @@ public class UserService {
                 .roleId(request.getRoleId())
                 .build();
 
+        // Generate a random password
+        String randomPassword = RandomStringUtils.randomAlphanumeric(8);
+
+        // Update the user's password
+        user.setPassword(randomPassword); // You might want to hash this before saving to the database
+
+        // Send email with the random password
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("vinhdaumoi2805.com");
+        message.setTo(user.getEmail());
+        message.setSubject("Thông báo");
+        message.setText("Chúc mừng bạn đã đăng ký tài khoản thành công. Mật khẩu của bạn là: " + randomPassword);
+        emailSender.send(message);
         userRepository.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

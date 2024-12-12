@@ -45,4 +45,7 @@ public class Order {
     @ColumnDefault("current_timestamp()")
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "status")
+    private Long status;
 }

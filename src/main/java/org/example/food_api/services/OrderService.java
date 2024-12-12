@@ -144,9 +144,9 @@ public class OrderService {
         orderRepository.save(order);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("vinhdaumoi2805.com");
-        if (user.getEmail() == null) {
-            user.setEmail("khanhlhfw@gmail.com");
-        }
+//        if (user.getEmail() == null) {
+//            user.setEmail("khanhlhfw@gmail.com");
+//        }
         message.setTo(user.getEmail());
         message.setSubject("Thông báo đặt hàng thành công");
         message.setText(emailMessage.toString());
@@ -179,4 +179,5 @@ public class OrderService {
         orderRepository.deleteById(orderId);
         return new ResponseEntity(HttpStatus.OK);
     }
+
 }
