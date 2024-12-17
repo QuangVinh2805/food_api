@@ -63,18 +63,12 @@ public class ProductService {
 
     public ResponseEntity<Product> createProduct(ProductRequest productRequest) {
         // Thiết lập Category cho ProductDetail
-        Category category = categoryRepository.findCategoryById(productRequest.getCategoryId());
-        if (category == null) {
-            String message = "Category not exists: ";
-            System.out.println(message + productRequest.getCategoryId());
-            return new ResponseEntity(message, HttpStatus.NO_CONTENT);
-        }
+        Category category = categoryRepository.findById(productRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
+
         // Kiểm tra sản phẩm đã tồn tại
-        Product existingProduct = productRepository.findByProductName(productRequest.getProductName());
-        if (existingProduct != null) {
-            String message = "Product name already exists: ";
-            System.out.println(message + existingProduct.getProductName());
-            return new ResponseEntity(message, HttpStatus.CONFLICT);
+        if (productRepository.findByProductName(productRequest.getProductName()) != null) {
+            return new ResponseEntity("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
         }
 
         // Tạo đối tượng Product từ ProductRequest
@@ -87,15 +81,15 @@ public class ProductService {
         ProductDetail productDetail = new ProductDetail();
         productDetail.setPrice(productRequest.getPrice());
         productDetail.setQuantity(productRequest.getQuantity());
-
         productDetail.setCategory(category);
+        productDetail.setStatus(1L); // Thiết lập giá trị cho trường status
 
         // Lưu sản phẩm và chi tiết sản phẩm vào cơ sở dữ liệu
-        productRepository.save(product);
-        productDetail.setProduct(product); // Liên kết ProductDetail với Product
+        Product savedProduct = productRepository.save(product);
+        productDetail.setProduct(savedProduct);
         productDetailRepository.save(productDetail);
 
-        return new ResponseEntity<>(product, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
     public ResponseEntity<Product> updateProduct(ProductRequest productRequest) {

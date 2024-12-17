@@ -6,6 +6,7 @@ import org.example.food_api.repository.UserRepository;
 import org.example.food_api.request.LoginRequest;
 import org.example.food_api.request.UserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -25,11 +26,16 @@ public class UserService {
     private JavaMailSender emailSender;
 
     public ResponseEntity<List<User>> listAllUser() {
-        List<User> listUser = userRepository.findAll();
+        // Sử dụng sắp xếp giảm dần theo `id`
+        List<User> listUser = userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+
         if (listUser.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            // Trả về NO_CONTENT nếu danh sách rỗng
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<User>>(listUser, HttpStatus.OK);
+
+        // Trả về danh sách người dùng và trạng thái OK
+        return new ResponseEntity<>(listUser, HttpStatus.OK);
     }
 
     public User findUser(@PathVariable("id") long id) {

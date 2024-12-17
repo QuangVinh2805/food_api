@@ -36,8 +36,8 @@ public class Product implements Serializable {
     private Long rate;
 
     @Size(max = 1)
-    @Column(name = "status", length = 1)
-    private Long status;
+    @Column(name = "status", length = 1,nullable = false)
+    private Long status = 1L;
 
     @Column(name = "create_at")
     private Instant createAt;
