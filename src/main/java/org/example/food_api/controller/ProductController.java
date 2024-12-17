@@ -33,6 +33,20 @@ public class ProductController {
         return productService.listAllProduct();
     }
 
+    @RequestMapping(value = "/find/{keyword}", method = RequestMethod.GET)
+    public ResponseEntity<List<ProductDetail>> findProduct(@PathVariable String keyword) {
+        List<ProductDetail> productDetails = productDetailRepository.findProductDetail(keyword);
+        if (productDetails.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(productDetails);
+    }
+
+    @RequestMapping(value = "/count", method = RequestMethod.GET)
+    public Long countProducts() {
+        return productDetailRepository.countProductDeTailByStatus(1L);
+    }
+
     @RequestMapping(value = "/alldetail", method = RequestMethod.GET)
     public ResponseEntity<List<ProductDetail>> listAllProductDetail(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "20") int size,

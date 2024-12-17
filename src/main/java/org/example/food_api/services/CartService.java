@@ -72,15 +72,22 @@ public class CartService {
             cart = new Cart(null, user, new Date(), null, totalPrice, product);
         }
         cartDetail = cartDetailRepository.findByCartId(cart.getId());
-        if (cartDetail == null){
+        if (cartDetail == null) {
             cartDetail = new CartDetail(null, cart, quantity, productDetail.getPrice(), totalPrice, new Date(), null);
             cartDetail.setQuantity(quantity);
-        }else{
+        } else {
             cartDetail.setQuantity(cartDetail.getQuantity() + quantity);
         }
         totalPrice = productDetail.getPrice() * cartDetail.getQuantity();
         cart.setTotalPrice(totalPrice);
         cartDetail.setTotalPrice(totalPrice);
+        if (quantity > productDetail.getQuantity()) {
+            String errorMessage = "Quá số lượng quy định";
+            System.out.println(errorMessage + cartDetail.getId());
+            return new ResponseEntity(errorMessage, HttpStatus.FORBIDDEN);
+        }
+        productDetail.setQuantity(productDetail.getQuantity() - quantity);
+        productDetailRepository.save(productDetail);
 
         cartRepository.save(cart);
         cartDetailRepository.save(cartDetail);
@@ -88,20 +95,20 @@ public class CartService {
     }
 
     public ResponseEntity<CartDetail> updateCart(CartRequest cartRequest) {
-        Long cardDetailId = cartRequest.getId();
+        Long cartDetailId = cartRequest.getId();
         Long quantity = cartRequest.getQuantity();
 
         String errorMessage = "";
-        if (cardDetailId == null) {
+        if (cartDetailId == null) {
             errorMessage = "cart id not found";
-            System.out.println(errorMessage + cardDetailId);
+            System.out.println(errorMessage + cartDetailId);
             return new ResponseEntity(errorMessage, HttpStatus.FORBIDDEN);
         }
 
-        CartDetail cartDetail = cartDetailRepository.findCartDetailById(cardDetailId);
+        CartDetail cartDetail = cartDetailRepository.findCartDetailById(cartDetailId);
         if (cartDetail == null) {
             errorMessage = "cart id not found";
-            System.out.println(errorMessage + cardDetailId);
+            System.out.println(errorMessage + cartDetailId);
             return new ResponseEntity(errorMessage, HttpStatus.FORBIDDEN);
         }
 
@@ -114,9 +121,11 @@ public class CartService {
         }
         if (quantity > productDetail.getQuantity()) {
             errorMessage = "Quá số lượng quy định";
-            System.out.println(errorMessage + cardDetailId);
+            System.out.println(errorMessage + cartDetailId);
             return new ResponseEntity(errorMessage, HttpStatus.FORBIDDEN);
         }
+        productDetail.setQuantity(productDetail.getQuantity() + (cartDetail.getQuantity() - quantity));
+        productDetailRepository.save(productDetail);
         cartDetail.setQuantity(quantity);
         Long totalPrice = quantity * productDetail.getPrice();
         cartDetail.setTotalPrice(totalPrice);

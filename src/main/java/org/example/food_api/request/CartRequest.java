@@ -16,6 +16,4 @@ public class CartRequest {
     private Long userId;
 
     private Long quantity;
-
-
 }

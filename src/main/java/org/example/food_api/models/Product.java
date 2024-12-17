@@ -11,6 +11,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -40,10 +41,10 @@ public class Product implements Serializable {
     private Long status = 1L;
 
     @Column(name = "create_at")
-    private Instant createAt;
+    private Date createAt;
 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Date updatedAt;
 
     @Size(max = 100)
     @Column(name = "image", length = 100)

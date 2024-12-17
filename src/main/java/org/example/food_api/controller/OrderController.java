@@ -27,8 +27,9 @@ public class OrderController {
     private OrderRepository orderRepository;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<Order>> listAllOrder() {
-        return orderService.listAllOrder();
+    public ResponseEntity<List<Order>> listAllOrder(@RequestParam(required = false) String startDate,
+                                                    @RequestParam(required = false) String endDate) {
+        return orderService.listAllOrder(startDate, endDate);
     }
 
     @DeleteMapping("/delete/{id}")

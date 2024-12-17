@@ -28,7 +28,7 @@ public class ProductService {
     ProductDetailRepository productDetailRepository;
 
     public ResponseEntity<List<Product>> listAllProduct() {
-        List<Product> listProduct = productRepository.findAll();
+        List<Product> listProduct = productRepository.findAllOrderByCreateAtDesc();
         if (listProduct.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

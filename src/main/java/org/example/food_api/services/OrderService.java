@@ -11,7 +11,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,8 +40,40 @@ public class OrderService {
     @Autowired
     private JavaMailSender emailSender;
 
-    public ResponseEntity<List<Order>> listAllOrder() {
-        List<Order> listOrder = orderRepository.findAll();
+    public ResponseEntity<List<Order>> listAllOrder(String startDateQuery, String endDateQuery) {
+        List<Order> listOrder = null;
+
+        if (startDateQuery != null && endDateQuery != null) {
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                Date createdAt = formatter.parse(startDateQuery);
+                Date endAt = formatter.parse(endDateQuery);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(createdAt);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                Date startDate = calendar.getTime();
+
+
+                Calendar calendar2 = Calendar.getInstance();
+                calendar2.setTime(endAt);
+                calendar2.set(Calendar.HOUR_OF_DAY, 23);
+                calendar2.set(Calendar.MINUTE, 59);
+                calendar2.set(Calendar.SECOND, 59);
+                Date endDate = calendar2.getTime();
+
+                if (endDate.after(startDate)) {
+                    listOrder = orderRepository.findByDate(startDate, endDate);
+                } else {
+                    listOrder = orderRepository.findAll();
+                }
+            } catch (Exception e) {
+                listOrder = orderRepository.findAll();
+            }
+        } else {
+            listOrder = orderRepository.findAll();
+        }
         if (listOrder.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
@@ -70,6 +104,7 @@ public class OrderService {
             return new ResponseEntity(message, HttpStatus.FORBIDDEN);
         }
         order.setStatus(status);
+        order.setUpdatedAt(new Date());
         orderRepository.save(order);
         List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrder(order);
 
@@ -108,6 +143,7 @@ public class OrderService {
         Long totalPrice = 0L;
         Order order = Order.builder()
                 .user(user)
+                .status(0L)
                 .address(request.getAddress())
                 .createdAt(new Date())
                 .build();

@@ -22,6 +22,8 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     List<ProductDetail> findByProduct(Product product);
 
+    Long countProductDeTailByStatus(Long status);
+
     @Query(value = "select * from product_detail p where p.product_id = :id", nativeQuery = true)
     ProductDetail findByProductId(@Param("id") Long id);
 
@@ -32,5 +34,10 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
     List<ProductDetail> findProductDetailsByProductId(@Param("productId") long productId);
 
     Page<ProductDetail> findByStatus(Pageable pageable, Long status);
+
+    @Query("SELECT DISTINCT pd FROM ProductDetail pd WHERE " +
+            "LOWER(pd.product.productName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(pd.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<ProductDetail> findProductDetail(@Param("keyword") String keyword);
 
 }
