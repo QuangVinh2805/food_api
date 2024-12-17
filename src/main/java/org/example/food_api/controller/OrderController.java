@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -52,6 +53,8 @@ public class OrderController {
 
     @PutMapping("/update")
     public ResponseEntity<OrderDetail> updateOrder(@RequestBody OrderRequest request) {
+        Date updatedAt = request.getUpdatedAt();
+        System.out.println("Ngày cập nhật: " + updatedAt); // Đã parse thành Date
         return orderService.updateOrder(request);
     }
 
