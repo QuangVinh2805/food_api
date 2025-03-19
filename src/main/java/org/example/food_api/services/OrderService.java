@@ -5,6 +5,7 @@ import org.example.food_api.models.*;
 import org.example.food_api.repository.*;
 import org.example.food_api.request.OrderRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -41,7 +42,7 @@ public class OrderService {
     private JavaMailSender emailSender;
 
     public ResponseEntity<List<Order>> listAllOrder(String startDateQuery, String endDateQuery) {
-        List<Order> listOrder = null;
+        List<Order> listOrder;
 
         if (startDateQuery != null && endDateQuery != null) {
             try {
