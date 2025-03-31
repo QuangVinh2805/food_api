@@ -35,7 +35,8 @@ public class CartController {
     }
 
     @RequestMapping(value = "/getCartByUser", method = RequestMethod.GET)
-    public ResponseEntity<List<CartDetail>> listCartByUser(@RequestParam Long userId) {
+    public ResponseEntity<List<CartDetail>> listCartByUser(
+            @RequestParam Long userId) {
         return cartService.listCartByUser(userId);
     }
 

@@ -148,6 +148,7 @@ public class UserService {
 
         // Cập nhật user trong database
         existingUser.setName(user.getName());
+        existingUser.setPassword(user.getPassword());
         existingUser.setBirthday(user.getBirthday());
         existingUser.setPhoneNumber(user.getPhoneNumber());
         existingUser.setEmail(user.getEmail());

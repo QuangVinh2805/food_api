@@ -48,9 +48,10 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/alldetail", method = RequestMethod.GET)
-    public ResponseEntity<List<ProductDetail>> listAllProductDetail(@RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "20") int size,
-                                                                    @RequestParam(required = false) Long status) {
+    public ResponseEntity<List<ProductDetail>> listAllProductDetail(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) Long status) {
         int totalProducts = (int) productDetailRepository.count();
         if (size == 0) size = totalProducts; // Hiển thị toàn bộ sản phẩm
 
